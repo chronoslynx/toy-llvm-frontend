@@ -1,5 +1,3 @@
-Toy LLVM front-end following along with http://gnuu.org/2009/09/18/writing-your-own-toy-compiler/.
+Toy LLVM front-end following along with http://llvm.org/releases/3.3/docs/tutorial/index.html
 
-Things to add after the tutorial is complete:
-- "return" statements
-- "if, else" clauses
+After this has been fully implemented I should try and do it with Flex and Bison
