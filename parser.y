@@ -25,7 +25,7 @@
    they represent.
  */
  %token <string> TIDENTIFIER TINTEGER TDOUBLE
- %token <token> TCEQ TCNE TCGT TCGE TCLT TCLE TCEQUAL
+ %token <token> TCEQ TCNE TCGT TCGE TCLT TCLE TEQUAL
  %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
  %token <token> TPLUS TMINUS TMULT TDIV
 
@@ -53,9 +53,13 @@
 program : stmts { programBlock = $1; }
         ;
 
-stmts : var_decl | func_decl
-      | expr { $$ = new NExpressionStament(*$1); }
+stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
+      | stmts stmt { $1->statements.push_back($<stmt>2); }
       ;
+
+stmt : var_decl | func_decl
+     | expr { $$ = new NExpressionStatement(*$1); }
+     ;
 
 block : TLBRACE stmts TRBRACE { $$ = $2; }
       | TLBRACE TRBRACE { $$ = new NBlock(); }
@@ -77,12 +81,10 @@ func_decl_args : /* blank */ { $$ = new VariableList(); }
 ident : TIDENTIFIER { $$ = new NIdentifier(*$1); delete $1; }
       ;
 
-// all possible definitions of "numeric" types
 numeric : TINTEGER { $$ = new NInteger(atoi($1->c_str())); delete $1; }
         | TDOUBLE { $$ = new NDouble(atof($1->c_str())); delete $1;  }
         ;
 
-// All possible definitions of an "expression"
 expr : TIDENTIFIER TEQUAL expr { $$ = new NAssignment(*$<ident>1, *$3); }
      | ident TLPAREN call_args TRPAREN { $$ = new NMethodCall(*$1, *$3); delete $3; }
      | ident {$<ident>$ = $1; }
@@ -91,6 +93,9 @@ expr : TIDENTIFIER TEQUAL expr { $$ = new NAssignment(*$<ident>1, *$3); }
      | TLPAREN expr TRPAREN { $$ = $2; }
      ;
 
+/*condition : expr comparison expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+          ;*/
+
 call_args : /* blank */ { $$ = new ExpressionList(); }
           | expr { $$ = new ExpressionList(); $$->push_back($1); }
           | call_args TCOMMA expr { $1->push_back($3); }
@@ -98,3 +103,8 @@ call_args : /* blank */ { $$ = new ExpressionList(); }
 comparison : TCEQ | TCNE | TCGT | TCLT | TCGE | TCLE
            | TPLUS | TMINUS | TMULT | TDIV
            ;
+
+/*if_stmt : TIF TLPAREN condition TRPAREN block { $$ } // need to figure out how to represent this in the AST
+        ;*/
+
+%%

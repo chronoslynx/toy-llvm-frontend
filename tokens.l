@@ -30,9 +30,6 @@ extern "C" int yywrap() { }
 "-"						return TOKEN(TMINUS);
 "*"						return TOKEN(TMULT);
 "/"						return TOKEN(TDIV);
-return 					printf("return keyword not implemented"); return TOKEN(TRETURN);
-if 						printf("if keyword not implemented"); return TOKEN(TIF);
-else 					printf("else keyword not implemented"); return TOKEN(TELSE);
 .						printf("Unknown token %s!\n", yytext); yyterminate();
 
 %%
